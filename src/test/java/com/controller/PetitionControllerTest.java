@@ -1,7 +1,6 @@
 package com.controller;
 
 import com.model.Petition;
-import com.model.Signature;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,9 +40,27 @@ public class PetitionControllerTest {
         // When
         mockMvc.perform(MockMvcRequestBuilders.post("/create-petition")
                 .flashAttr("petition", petition))
-        // Then
+
+                // Then
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/view-petition/" + petition.getId()));
+    }
+
+    @Test
+    public void testShowSinglePetitionPage() throws Exception {
+        // Setup
+        mockMvc = MockMvcBuilders.standaloneSetup(petitionController).build();
+        Petition petition = new Petition(); // You need to create a Petition object or mock it as needed
+
+        // Mock behavior
+        when(petitions.stream()).thenReturn(Stream.of(petition));
+        when(petitions.stream().filter(p -> p.getId().equals(petition.getId()))).thenReturn(Stream.of(petition));
+
+        // Perform the GET request
+        mockMvc.perform(MockMvcRequestBuilders.get("/view-petition/" + petition.getId()))
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.view().name("view-petition"))
+                .andExpect(MockMvcResultMatchers.model().attribute("petition", petition));
     }
 
 }
