@@ -1,34 +1,42 @@
 package com.controller;
 
-// Imports...
-
 import com.model.Petition;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import com.model.Signature;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
-@RequestMapping("/petitions")
+@Controller
 public class PetitionController {
 
     private List<Petition> petitions = new ArrayList<>();
 
-    @PostMapping
-    public ModelAndView createPetition(@RequestBody MultiValueMap paramMap) {
-        petitions.add(new Petition(paramMap.get("title").toString(), paramMap.get("description").toString()));
-        return new ModelAndView("redirect:/petitions");
+    public PetitionController() {
+        Petition petition1 = new Petition("Unite Against Climate Crisis",
+                "The world is facing an unprecedented environmental crisis");
+        petition1.addSignature(new Signature("Emmet Dunne", "emmet@gmail.com"));
+        Petition petition2 = new Petition("End the Conflict in Ukraine",
+                "The war in Ukraine has reached a critical juncture");
+        petition2.addSignature(new Signature("John Smith", "john@gmail.com"));
+        petitions.addAll(List.of(petition1, petition2));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Petition>> getAllPetitions() {
-        return ResponseEntity.ok(petitions);
+    @GetMapping("/create-petition")
+    public String showCreatePetitionForm(Model model) {
+        model.addAttribute("petition", new Petition());
+        return "create-petition";
     }
 
-    // Implement other methods for searching, viewing specific petition, and signing.
+    @PostMapping("/create-petition")
+    public ModelAndView createPetition(@ModelAttribute("petition") Petition petition) {
+        petitions.add(petition);
+        return new ModelAndView("redirect:/view-petition/" + petition.getId());
+    }
+
 }
