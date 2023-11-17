@@ -4,13 +4,12 @@ import com.model.Petition;
 import com.model.Signature;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class PetitionController {
@@ -37,6 +36,32 @@ public class PetitionController {
     public ModelAndView createPetition(@ModelAttribute("petition") Petition petition) {
         petitions.add(petition);
         return new ModelAndView("redirect:/view-petition/" + petition.getId());
+    }
+
+    @GetMapping("/view-petitions")
+    public String showAllPetitionsPage(Model model) {
+        model.addAttribute("petitions", petitions);
+        return "view-petitions";
+    }
+
+    @GetMapping("/view-petition/{id}")
+    public String showSinglePetitionPage(@PathVariable("id") UUID id, Model model) {
+        model.addAttribute("petition", petitions.stream()
+                .filter(petition -> petition.getId().equals(id))
+                .findFirst()
+                .orElse(null));
+        model.addAttribute("signature", new Signature());
+        return "view-petition";
+    }
+
+    @PostMapping("/view-petition/add-signature")
+    public ModelAndView addSignatureToPetition(@RequestParam(name = "id") UUID id,
+                                               @ModelAttribute("signature") Signature signature) {
+        petitions.stream()
+                .filter(petition -> petition.getId().equals(id))
+                .findFirst()
+                .ifPresent(foundPetition -> foundPetition.addSignature(signature));
+        return new ModelAndView("redirect:/view-petition/" + id);
     }
 
 }
