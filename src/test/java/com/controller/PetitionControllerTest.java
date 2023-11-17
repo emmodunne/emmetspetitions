@@ -48,19 +48,43 @@ public class PetitionControllerTest {
 
     @Test
     public void testShowSinglePetitionPage() throws Exception {
-        // Setup
+        // Given
         mockMvc = MockMvcBuilders.standaloneSetup(petitionController).build();
-        Petition petition = new Petition(); // You need to create a Petition object or mock it as needed
+        Petition petition1 = new Petition("Example Petition 1", "Example Petition 1");
+        Petition petition2 = new Petition("Petition 2", "Petition 2");
 
-        // Mock behavior
-        when(petitions.stream()).thenReturn(Stream.of(petition));
-        when(petitions.stream().filter(p -> p.getId().equals(petition.getId()))).thenReturn(Stream.of(petition));
+        // Mock
+        when(petitions.stream()).thenReturn(Stream.of(petition1, petition2));
 
-        // Perform the GET request
-        mockMvc.perform(MockMvcRequestBuilders.get("/view-petition/" + petition.getId()))
+        // When
+        mockMvc.perform(MockMvcRequestBuilders.get("/view-petition/" + petition1.getId()))
+
+                // Then
                 .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
                 .andExpect(MockMvcResultMatchers.view().name("view-petition"))
-                .andExpect(MockMvcResultMatchers.model().attribute("petition", petition));
+                .andExpect(MockMvcResultMatchers.model().attribute("petition", petition1));
+    }
+
+    @Test
+    public void testSearchPetitions() throws Exception {
+        // Given
+        mockMvc = MockMvcBuilders.standaloneSetup(petitionController).build();
+        String searchKeyword = "example";
+        Petition petition1 = new Petition("Example Petition 1", "Example Petition 1");
+        Petition petition2 = new Petition("Petition 2", "Petition 2");
+
+        // Mock behavior
+        when(petitions.stream()).thenReturn(Stream.of(petition1, petition2));
+
+        // When
+        mockMvc.perform(MockMvcRequestBuilders.post("/search-petitions")
+                .param("search", searchKeyword))
+
+                // Then
+                .andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+                .andExpect(MockMvcResultMatchers.view().name("result-search-petition"))
+                .andExpect(MockMvcResultMatchers.model().attribute("petitions", List.of(petition1)));
+
     }
 
 }
