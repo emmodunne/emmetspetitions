@@ -1,22 +1,17 @@
 pipeline {
     agent any
 
-    environment {
-        WAR_FILE_NAME = 'myapp.war'
-        TOMCAT_MANAGER_URL = "http://YOUR_TOMCAT_MANAGER_USERNAME:YOUR_TOMCAT_MANAGER_PASSWORD@localhost:8080/manager/text"
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                // Get code from GitHub test
+                // Get code from GitHub
                 git 'https://github.com/emmodunne/emmetspetitions.git'
             }
         }
 
          stage('Build, Test & Package') {
             steps {
-                // Build and Test steps (Replace with actual build and test commands)
+                // Build, Test and Package steps
                 sh 'mvn clean package'
             }
         }
