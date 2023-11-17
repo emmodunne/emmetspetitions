@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 public class PetitionController {
@@ -62,6 +63,19 @@ public class PetitionController {
                 .findFirst()
                 .ifPresent(foundPetition -> foundPetition.addSignature(signature));
         return new ModelAndView("redirect:/view-petition/" + id);
+    }
+
+    @GetMapping("/search-petitions")
+    public String showSearchPetitionsPage() {
+        return "search-petitions";
+    }
+
+    @PostMapping("/search-petitions")
+    public String searchPetitions(@RequestParam("search") String search, Model model) {
+        model.addAttribute("petitions", petitions.stream()
+                .filter(petition -> petition.getTitle().toUpperCase().contains(search.toUpperCase()))
+                .collect(Collectors.toList()));
+        return "result-search-petition";
     }
 
 }
