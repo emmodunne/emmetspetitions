@@ -27,7 +27,10 @@ public class PetitionController {
         Petition petition3 = new Petition("Ban the use of single-use plastic",
                 "Our environment is ruined with litter");
         petition3.addSignature(new Signature("Terry Connors", "terry@gmail.com"));
-        petitions.addAll(List.of(petition1, petition2, petition3));
+        Petition petition4 = new Petition("Stop corruption in the government",
+                "The Dail has seen many shady characters");
+        petition4.addSignature(new Signature("Sam Smith", "sam@gmail.com"));
+        petitions.addAll(List.of(petition1, petition2, petition3, petition4));
     }
 
     @GetMapping("/create-petition")
